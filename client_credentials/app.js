@@ -28,12 +28,24 @@ request.post(authOptions, function(error, response, body) {
     // use the access token to access the Spotify Web API
     var token = body.access_token;
     var options = {
+      url: 'https://api.spotify.com/v1/tracks/11dFghVXANMlKmJXsNCbNl',
+      headers: {
+        'Authorization': 'Bearer ' + token
+      },
+      json: true
+    };
+    request.get(options, function(error, response, body) {
+      console.log(body);
+    });
+
+    var options = {
       url: 'https://api.spotify.com/v1/audio-features/11dFghVXANMlKmJXsNCbNl',
       headers: {
         'Authorization': 'Bearer ' + token
       },
       json: true
     };
+
     request.get(options, function(error, response, body) {
       console.log(body);
     });
