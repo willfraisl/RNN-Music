@@ -52,19 +52,24 @@ function getSongsByArtist(artistName){
 }
 
 // gets the audio features for a given song id
-function getAudioFeaturesForTrack(trackID){
+function getAudioFeaturesForTrack(trackID, callback){
     getAuthorizationToken(function(token) { 
         spotifyApi.setAccessToken(token);
         spotifyApi.getAudioFeaturesForTrack(trackID)
         .then(function(data) {
-            console.log(data.body);
+            //console.log(data.body);
+            callback(data);
         }, function(err) {
             console.log('Something went wrong!', err);
         });
     });
+        
 }
 
-
+function getTest(test){
+    document.getElementById("demo").innerHTML = test;
+    return test;
+}
 function getAuthorizationToken(callback){
     var token;
     // your application requests authorization
@@ -89,5 +94,8 @@ function getAuthorizationToken(callback){
     
 }
 var params = {min_energy: 0.4, seed_artists: ['6mfK6Q2tzLMEchAr0e9Uzu', '4DYFVNKZ1uixa6SQTvzQwJ'], min_popularity: 0 };
-getRecomendations(params);
-getAudioFeaturesForTrack('4tgJDSBLGNnDZC3BOTJAuy');
+
+getAudioFeaturesForTrack('4tgJDSBLGNnDZC3BOTJAuy', function(data){ 
+    console.log(data.body)
+});
+console.log(getTest(1));

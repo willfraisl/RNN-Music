@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+  <head>
+    <title>RNN-Music</title>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <style type="text/css">
+      #login, #loggedin {
+        display: none;
+      }
+      .text-overflow {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        width: 500px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <script src="../spotifyFunctions.js"></script>
+    <div class="container">
+      <div id="search">
+        <h1>RNN-Music</h1>
+        <form>
+          Song/Artist: <input type="text" name="entry">
+          
+          <input type="button" value="Create Station" onclick="myFunction()">
+          <p id="demo"></p>
+          
+          <script>
+            function myFunction(){
+              // W.I.P
+              // trying to get this to display data from a spotify function, but it doesn't work :/
+              // next step is to use the search field to search for data for a specific song and display it
+              getAudioFeaturesForTrack('4tgJDSBLGNnDZC3BOTJAuy', function(data){ 
+                document.getElementById("demo").innerHTML = data.body;
+              });
+            }
+          </script>
+          
+            
+          </script>
+        </form>
+      </div>
+  </body>
+</html>
+

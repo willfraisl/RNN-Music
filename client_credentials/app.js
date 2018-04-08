@@ -6,11 +6,13 @@
  * For more information, read
  * https://developer.spotify.com/web-api/authorization-guide/#client_credentials_flow
  */
-
+var express = require('express'); // Express web server framework
 var request = require('request'); // "Request" library
+var SecretData = require('../SecretData.js');
+let secretData = new SecretData();
 
-var client_id = 'CLIENT_ID'; // Your client id
-var client_secret = 'CLIENT_SECRET'; // Your secret
+var client_id = secretData.client_id; // Your client id
+var client_secret = secretData.client_secret; // Your secret
 
 // your application requests authorization
 var authOptions = {
@@ -36,9 +38,19 @@ request.post(authOptions, function(error, response, body) {
       },
       json: true
     };
-
     request.get(options, function(error, response, body) {
       console.log(body);
     });
   }
 });
+
+
+var app = express();
+app.use(express.static(__dirname + '/public'));
+console.log('Listening on 8888');
+app.listen(8888);
+//var app = express();
+
+//app.use(express.static(__dirname + '/public'))
+//  .use(cookieParser());
+
