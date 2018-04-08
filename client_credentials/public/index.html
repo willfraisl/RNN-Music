@@ -17,7 +17,6 @@
   </head>
 
   <body>
-    <script src="../spotifyFunctions.js"></script>
     <div class="container">
       <div id="search">
         <h1>RNN-Music</h1>
@@ -26,15 +25,18 @@
           
           <input type="button" value="Create Station" onclick="myFunction()">
           <p id="demo"></p>
-          
+          <script src="../spotifyFunctions.js"></script>
           <script>
             function myFunction(){
+              //this works
+              //document.getElementById("demo").innerHTML = "test";
+
               // W.I.P
-              // trying to get this to display data from a spotify function, but it doesn't work :/
-              // next step is to use the search field to search for data for a specific song and display it
+              // trying to get this to display data from a spotify function, but it doesn't work 
               getAudioFeaturesForTrack('4tgJDSBLGNnDZC3BOTJAuy', function(data){ 
                 document.getElementById("demo").innerHTML = data.body;
               });
+              // next step is to use the search field to search for data for a specific song and display it
             }
           </script>
           
