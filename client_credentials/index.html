@@ -1,5 +1,6 @@
 <!doctype html>
 <html>
+  <script type="text/javascript" src="spotifyFunctions.js"></script>
   <head>
     <title>RNN-Music</title>
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
@@ -25,18 +26,19 @@
           
           <input type="button" value="Create Station" onclick="myFunction()">
           <p id="demo"></p>
-          <script src="../spotifyFunctions.js"></script>
           <script>
             function myFunction(){
               //this works
               //document.getElementById("demo").innerHTML = "test";
-
+              
               // W.I.P
               // trying to get this to display data from a spotify function, but it doesn't work 
               getAudioFeaturesForTrack('4tgJDSBLGNnDZC3BOTJAuy', function(data){ 
-                document.getElementById("demo").innerHTML = data.body;
+                document.getElementById("demo").innerHTML = "data.body";
               });
+              
               // next step is to use the search field to search for data for a specific song and display it
+            
             }
           </script>
         </form>

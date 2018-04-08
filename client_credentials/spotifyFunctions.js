@@ -57,6 +57,7 @@ function getAudioFeaturesForTrack(trackID, callback){
         spotifyApi.setAccessToken(token);
         spotifyApi.getAudioFeaturesForTrack(trackID)
         .then(function(data) {
+            document.getElementById("demo").innerHTML = "tetet";
             //console.log(data.body);
             callback(data);
         }, function(err) {
@@ -66,13 +67,10 @@ function getAudioFeaturesForTrack(trackID, callback){
         
 }
 
-function getTest(test){
-    document.getElementById("demo").innerHTML = test;
-    return test;
-}
 function getAuthorizationToken(callback){
     var token;
     // your application requests authorization
+    
     var authOptions = {
         url: 'https://accounts.spotify.com/api/token',
         headers: {
@@ -83,7 +81,7 @@ function getAuthorizationToken(callback){
         },
         json: true
     };
-
+    
     request.post(authOptions, function(error, response, body) {
         if (!error && response.statusCode === 200) {
             // use the access token to access the Spotify Web API
@@ -93,6 +91,7 @@ function getAuthorizationToken(callback){
     });
     
 }
+
 var params = {min_energy: 0.4, seed_artists: ['6mfK6Q2tzLMEchAr0e9Uzu', '4DYFVNKZ1uixa6SQTvzQwJ'], min_popularity: 0 };
 
 getAudioFeaturesForTrack('4tgJDSBLGNnDZC3BOTJAuy', function(data){ 
