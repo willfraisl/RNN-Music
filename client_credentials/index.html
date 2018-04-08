@@ -1,5 +1,7 @@
 <!doctype html>
 <html>
+  <script type="text/javascript" src="app.js"></script>
+  <script type="text/javascript" src="SecretData.js"></script>
   <script type="text/javascript" src="spotifyFunctions.js"></script>
   <head>
     <title>RNN-Music</title>
@@ -33,10 +35,10 @@
               
               // W.I.P
               // trying to get this to display data from a spotify function, but it doesn't work 
-              getAudioFeaturesForTrack('4tgJDSBLGNnDZC3BOTJAuy', function(data){ 
-                document.getElementById("demo").innerHTML = "data.body";
-              });
-              
+              document.getElementById("demo").innerHTML = getData();
+              //getAudioFeaturesForTrack('4tgJDSBLGNnDZC3BOTJAuy', function(data){ 
+              // document.getElementById("demo").innerHTML = "data.body";
+              //});
               // next step is to use the search field to search for data for a specific song and display it
             
             }

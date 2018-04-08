@@ -1,17 +1,26 @@
-var SecretData = require('../SecretData.js');
-let secretData = new SecretData();
 var request = require('request');
-
 var SpotifyWebApi = require('spotify-web-api-node');
-var client_id = secretData.client_id; // Your client id
-var client_secret = secretData.client_secret; // Your secret
+
+var client_id = getClientId(); // Your client id
+var client_secret = getClientSecret(); // Your secret
 
 // credentials are optional
 var spotifyApi = new SpotifyWebApi({
-    clientId : secretData.client_id,
-    clientSecret : secretData.client_secret,
-    redirectUri : secretData.redirec_tUri
+    clientId : sgetClientId(),
+    clientSecret : getClientSecret(),
+    redirectUri : getRedirectURI()
 });
+
+function getClientId(){
+    return '2153204389124b6097a0e86ca3a17f46'; // Your client id
+}
+function getClientSecret(){
+    return '55a4e744962a4d8e97bf54cc4bc44c32'; // Your secret
+}
+function getRedirectURI(){
+    return 'http://localhost:8888/callback'; // Redirect URI
+}
+
 
 // gets recomended songs based on given features
 function getRecomendations(options){
@@ -69,7 +78,7 @@ function getAudioFeaturesForTrack(trackID, callback){
 function getAuthorizationToken(callback){
     var token;
     // your application requests authorization
-    
+    document.getElementById("demo").innerHTML = "test";
     var authOptions = {
         url: 'https://accounts.spotify.com/api/token',
         headers: {
