@@ -34,32 +34,6 @@ function getRecomendations(options){
     });
 }
 
-// doesn't seem to be outputting to JSON very well
-function getSongsByName(songName){
-    getAuthorizationToken(function(token) { 
-        spotifyApi.setAccessToken(token);
-        spotifyApi.searchTracks('track:'+songName)
-        .then(function(data) {
-        console.log('Search by ' + songName, data.body);
-        }, function(err) {
-        console.error(err);
-        });
-    });
-}
-
-// doesn't seem to be outputting to JSON very well
-function getSongsByArtist(artistName){
-    getAuthorizationToken(function(token) { 
-        spotifyApi.setAccessToken(token);
-        spotifyApi.searchTracks('artist:'+artistName)
-        .then(function(data) {
-        console.log('Search tracks by ' + artistName + ' in the artist name', data.body);
-        }, function(err) {
-        console.log('Something went wrong!', err);
-        });
-    }); 
-}
-
 // gets the audio features for a given song id
 function getAudioFeaturesForTrack(trackID, callback){
     getAuthorizationToken(function(token) { 
