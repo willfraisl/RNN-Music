@@ -48,7 +48,7 @@ function getSongsByArtist(artistName){
         }, function(err) {
         console.log('Something went wrong!', err);
         });
-    });
+    }); 
 }
 
 // gets the audio features for a given song id
@@ -57,7 +57,6 @@ function getAudioFeaturesForTrack(trackID, callback){
         spotifyApi.setAccessToken(token);
         spotifyApi.getAudioFeaturesForTrack(trackID)
         .then(function(data) {
-            document.getElementById("demo").innerHTML = "tetet";
             //console.log(data.body);
             callback(data);
         }, function(err) {
@@ -97,4 +96,3 @@ var params = {min_energy: 0.4, seed_artists: ['6mfK6Q2tzLMEchAr0e9Uzu', '4DYFVNK
 getAudioFeaturesForTrack('4tgJDSBLGNnDZC3BOTJAuy', function(data){ 
     console.log(data.body)
 });
-console.log(getTest(1));
