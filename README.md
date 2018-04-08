@@ -1,6 +1,35 @@
-# RNN-Music
+# Spotify Accounts Authentication Examples
 
-### Project Idea:
+This project contains basic demos showing the different OAuth 2.0 flows for [authenticating against the Spotify Web API](https://developer.spotify.com/web-api/authorization-guide/).
 
-Our project will be a song recommendation system. It will use songs frequently listened to by the user to predict new songs that they may enjoy. This will function similarly to pandora where users input a starting artist or song and learns a user's music taste through a like and dislike system.
-With Spotify’s API we will have access to all Spotify’s music. Each song also has attributes attached to it such as popularity, danciblity, etc. We will use these attributes to find similar songs that a user may enjoy.  Connecting both the user’s likes and dislikes along with the attributes of songs, we will be able to create a system that recommends songs that the user will like.
+These examples cover:
+
+* Authorization Code flow
+* Client Credentials flow
+* Implicit Grant flow
+
+## Installation
+
+These examples run on Node.js. On [its website](http://www.nodejs.org/download/) you can find instructions on how to install it. You can also follow [this gist](https://gist.github.com/isaacs/579814) for a quick and easy way to install Node.js and npm.
+
+Once installed, clone the repository and install its dependencies running:
+
+    $ npm install
+
+### Using your own credentials
+You will need to register your app and get your own credentials from the Spotify for Developers Dashboard.
+
+To do so, go to [your Spotify for Developers Dashboard](https://beta.developer.spotify.com/dashboard) and create your application. For the examples, we registered these Redirect URIs:
+
+* http://localhost:8888 (needed for the implicit grant flow)
+* http://localhost:8888/callback
+
+Once you have created your app, replace the `client_id`, `redirect_uri` and `client_secret` in the examples with the ones you get from My Applications.
+
+## Running the examples
+In order to run the different examples, open the folder with the name of the flow you want to try out, and run its `app.js` file. For instance, to run the Authorization Code example do:
+
+    $ cd authorization_code
+    $ node app.js
+
+Then, open `http://localhost:8888` in a browser.
