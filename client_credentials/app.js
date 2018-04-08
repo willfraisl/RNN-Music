@@ -42,14 +42,17 @@ request.post(authOptions, function(error, response, body) {
     // use the access token to access the Spotify Web API
     var token = body.access_token;
     var options = {
-      url: 'https://api.spotify.com/v1/users/jmperezperez',
+      url: 'https://api.spotify.com/v1/users/124632828/playlists/6X2OFVuHppo7uZHPjfJitd/tracks',
       headers: {
         'Authorization': 'Bearer ' + token
       },
       json: true
     };
+    //gets list of track ids
     request.get(options, function(error, response, body) {
-      console.log(body);
+      for(var i=0; i<body.total; i++){
+        console.log(body.items[i].track.id);
+      }
     });
   }
 });
