@@ -6,6 +6,7 @@
  */
 var express = require('express'); // Express web server framework
 var request = require('request'); // "Request" library
+var fs = require('fs');
 var SpotifyWebApi = require('spotify-web-api-node');
 
 var client_id = getClientId(); // Your client id
@@ -92,10 +93,18 @@ function getAuthorizationToken(callback){
   
 }
 
+function writeToFile(){
+  
+}
+
+var jsonData = {
+  "song": []
+}
+
 getPlaylistTracks('124632828', '6X2OFVuHppo7uZHPjfJitd', function(data){
   for(var i=0; i<data.body.total; i++){
     getAudioFeaturesForTrack(data.body.items[i].track.id, function(data){ 
-      console.log(data.body)
+      jsonData.song[i] = data.body;
     });
   }
 });
