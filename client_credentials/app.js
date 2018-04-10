@@ -93,21 +93,33 @@ function getAuthorizationToken(callback){
   
 }
 
-function writeToFile(){
-  
-}
-
 var jsonData = {
   "song": []
 }
 
-getPlaylistTracks('124632828', '6X2OFVuHppo7uZHPjfJitd', function(data){
-  for(var i=0; i<data.body.total; i++){
-    getAudioFeaturesForTrack(data.body.items[i].track.id, function(data){ 
-      jsonData.song[i] = data.body;
-    });
-  }
+function getFile(callback){
+  getPlaylistTracks('124632828', '6X2OFVuHppo7uZHPjfJitd', function(data){
+    var itemsRemaining = data.body.total;
+    for(var i=0; i<data.body.total; i++){
+      //var variables = jsonData;
+      getAudioFeaturesForTrack(data.body.items[i].track.id,function(data){ 
+        itemsRemaining--;
+        jsonData.song[itemsRemaining] = data.body;
+        //console.log(jsonData);
+        if(itemsRemaining == 0){
+          callback(jsonData);
+        }
+      });
+    }
+  });
+}
+
+getFile(function(data){
+  console.log(data);
 });
+
+
+
 
 var app = express();
 app.use(express.static(__dirname));
