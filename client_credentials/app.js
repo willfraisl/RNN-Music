@@ -32,46 +32,12 @@ spotifyApi.clientCredentialsGrant()
       if (err) {
         return console.log(err);
       }
-<<<<<<< HEAD
       console.log("The file was saved!");
     });
   })
   .catch(err => {
     console.log('error! ' + err);
   });
-=======
-  });
-  
-}
-
-var jsonData = {
-  "song": []
-}
-
-function getFile(callback){
-  getPlaylistTracks('124632828', '6X2OFVuHppo7uZHPjfJitd', function(data){
-    var itemsRemaining = data.body.total;
-    for(var i=0; i<data.body.total; i++){
-      //var variables = jsonData;
-      getAudioFeaturesForTrack(data.body.items[i].track.id,function(data){ 
-        itemsRemaining--;
-        jsonData.song[itemsRemaining] = data.body;
-        //console.log(jsonData);
-        if(itemsRemaining == 0){
-          callback(jsonData);
-        }
-      });
-    }
-  });
-}
-
-getFile(function(data){
-  console.log(data);
-});
->>>>>>> 080bbef6f86e5b37292111a13ca3bdf76e9ca6e2
-
-
-
 
 var app = express();
 app.use(express.static(__dirname));
