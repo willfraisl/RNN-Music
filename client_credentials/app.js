@@ -9,105 +9,35 @@ var request = require('request'); // "Request" library
 var fs = require('fs');
 var SpotifyWebApi = require('spotify-web-api-node');
 
-var client_id = getClientId(); // Your client id
-var client_secret = getClientSecret(); // Your secret
-
 // credentials are optional
 var spotifyApi = new SpotifyWebApi({
-  clientId : getClientId(),
-  clientSecret : getClientSecret(),
-  redirectUri : getRedirectURI()
+  clientId : 'c0f7fcc3fc594f4d9386be861bbc4770',
+  clientSecret : '2be1642fdb974830b848db3156441c91',
+  redirectUri : 'http://localhost:8888/callback'
 });
 
-function getClientId(){
-  return '2153204389124b6097a0e86ca3a17f46'; // Your client id
-}
-
-function getClientSecret(){
-  return '55a4e744962a4d8e97bf54cc4bc44c32'; // Your secret
-}
-
-function getRedirectURI(){
-  return 'http://localhost:8888/callback'; // Redirect URI
-}
-
-// gets recomended songs based on given features
-function getRecomendations(options){
-  getAuthorizationToken(function(token) { 
-      spotifyApi.setAccessToken(token);
-      spotifyApi.getRecommendations(options)
-      .then(function(data) {
-          console.log('Artist albums', data.body);
-      }, function(err) {
-          console.error(err);
-      });
-  });
-}
-
-// gets the audio features for a given song id
-function getAudioFeaturesForTrack(trackID, callback){
-  getAuthorizationToken(function(token) { 
-      spotifyApi.setAccessToken(token);
-      spotifyApi.getAudioFeaturesForTrack(trackID)
-      .then(function(data) {
-          callback(data);
-      }, function(err) {
-          console.log('Something went wrong!', err);
-      });
-  });
-}
-
-// gets the tracks in a public playlist
-function getPlaylistTracks(UserID, PlaylistID, callback){
-  getAuthorizationToken(function(token) { 
-      spotifyApi.setAccessToken(token);
-      spotifyApi.getPlaylistTracks(UserID, PlaylistID)
-      .then(function(data) {
-          callback(data);
-      }, function(err) {
-          console.log('Something went wrong!', err);
-      });
-  });
-}
-
-function getAuthorizationToken(callback){
-  var token;
-  var authOptions = {
-      url: 'https://accounts.spotify.com/api/token',
-      headers: {
-      'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64'))
-      },
-      form: {
-      grant_type: 'client_credentials'
-      },
-      json: true
-  };
-  
-  request.post(authOptions, function(error, response, body) {
-      if (!error && response.statusCode === 200) {
-          // use the access token to access the Spotify Web API
-          token = body.access_token;
-          callback(token);
+spotifyApi.clientCredentialsGrant()
+  .then(token => {
+    spotifyApi.setAccessToken(token.body.access_token);
+    return spotifyApi.getPlaylistTracks('124632828', '5WFfUARNKNylRTkJexElzb');
+  })
+  .then(playlistTracks => {
+    return Promise.all(playlistTracks.body.items.map(item => {
+      return spotifyApi.getAudioFeaturesForTrack(item.track.id);
+    }))
+  })
+  .then(songsAttributes => {
+    //save to file here
+    fs.writeFile("songs.json", JSON.stringify(songsAttributes), 'utf8', function (err) {
+      if (err) {
+        return console.log(err);
       }
-  });
-  
-}
-
-function writeToFile(){
-  
-}
-
-var jsonData = {
-  "song": []
-}
-
-getPlaylistTracks('124632828', '6X2OFVuHppo7uZHPjfJitd', function(data){
-  for(var i=0; i<data.body.total; i++){
-    getAudioFeaturesForTrack(data.body.items[i].track.id, function(data){ 
-      jsonData.song[i] = data.body;
+      console.log("The file was saved!");
     });
-  }
-});
+  })
+  .catch(err => {
+    console.log('error! ' + err);
+  });
 
 var app = express();
 app.use(express.static(__dirname));
