@@ -19,7 +19,7 @@ var spotifyApi = new SpotifyWebApi({
 spotifyApi.clientCredentialsGrant()
   .then(token => {
     spotifyApi.setAccessToken(token.body.access_token);
-    return spotifyApi.getPlaylistTracks('124632828', '5WFfUARNKNylRTkJexElzb');
+    return spotifyApi.getPlaylistTracks('124632828', '6X2OFVuHppo7uZHPjfJitd');
   })
   .then(playlistTracks => {
     return Promise.all(playlistTracks.body.items.map(item => {
