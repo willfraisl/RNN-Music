@@ -26,17 +26,24 @@ def KMeansCluster(vectors, num_clusters):
       kmeans.train(input_fn)
       cluster_centers = kmeans.cluster_centers()
       previous_centers = cluster_centers
-
-    print('cluster centers:', cluster_centers)
+    return cluster_centers
 
 
 # Example
-num_points = 100
-dimensions = 10
-points = np.random.uniform(0, 1000, [num_points, dimensions])
-nClusters = 5
-KMeansCluster(points, nClusters)
+#num_points = 100
+#dimensions = 10
+#points = np.random.uniform(0, 1000, [num_points, dimensions])
+#nClusters = 5
+#KMeansCluster(points, nClusters)
 
+# put in a list of all of new songs and to classify them as unsure
+def initializePlaylistSongs(songList):
+    #vectors = []
+    classification = []
+    for i in range(len(songList)):
+        #vectors.append(songList[i])
+        classification.append(2)
+    return classification
 
 
 # vectors is a list of lists of attributes of each song
@@ -49,16 +56,98 @@ def getNBayes(vecotrs, classification):
     model.fit(vecotrs, classification)
     return model
 
+
 # gets a predicted value based on a given NBayes model
-def predictSong(NBayes, predictionInput):
+def predictSongs(NBayes, predictionInput):
     # get predicted value
     predictedValue = NBayes.predict(predictionInput)
     print(predictedValue)
     return predictedValue
 
+
+# gets rid of repeat songs
+def consolidateSongLists(list1, list2):
+    consolidatedList = []
+    for i in range(len(list1)):
+
+        for j in range(len(list2)):
+            if list1[i] == list2[j]:
+                consolidatedList
+            else:
+                consolidatedList.append(list1[i])
+    return consolidatedList
+
+
+# consolidate the predicted classification of spotify's reccomendations
+# for each cluster of data into the three classification lists 
+def getReccomendationLists(clusters, model):
+    # create lists of potential songs seperated by priority
+    unlikedList = []
+    likedList = []
+    unsureList = []
+    skippedList = []
+    alreadyPlayed = []
+
+    for i in range(len(clusters)):
+        #songs = getSpotifySeeds(clusters[i])
+
+        # mock list of returned potential songs
+        songs = [clusters[i]]
+        songPredictions = predictSongs(model, songs)
+        for j in range(len(songPredictions)):
+            if songPredictions[j] == 0:
+                unlikedList.append(songPredictions[j])
+            elif songPredictions[j] == 1:
+                likedList.append(songPredictions[j])
+            elif songPredictions[j] == 2:
+                unsureList.append(songPredictions[j])
+            else:
+                skippedList.append(songPredictions[j])
+
+    return (unlikedList, likedList, unsureList, skippedList)
+
 # Example
 x = np.array([[-3, 7], [1, 5], [1, 2], [-2, 0], [2, 3], [-4, 0], [-1, 1], [1, 1], [-2, 2], [2, 7], [-4, 1], [-2, 7]])
-y = np.array([3, 3, 3, 3, 4, 3, 3, 4, 3, 4, 4, 4])
-model = getNBayes(x,y)
-testValues = [[1,2],[3,4]]
-predictSong(model, testValues)
+
+# only run once to get initial songs classified
+songClassifications = initializePlaylistSongs(x)
+print("Song Classifications")
+print(songClassifications)
+
+# cluster the songs 
+num_clusters = 3
+clusters = KMeansCluster(x, num_clusters)
+print('cluster centers:')
+print(clusters)
+
+# create a new model based off these songs
+model = getNBayes(x, songClassifications)
+
+# display the reccomended songs
+tup = getReccomendationLists(clusters, model)
+print(len(tup[0])," UNLIKED SONGS")
+print(tup[0])
+print(len(tup[1])," LIKED SONGS")
+print(tup[1])
+print(len(tup[2])," POTENTIAL SONGS")
+print(tup[2])
+print(len(tup[3])," SKIPPED SONGS")
+print(tup[3])
+
+# pick a random song from the highest priority classification list and play that song
+#alreadyPlayed.append(likedList.pop(0))
+#alreadyPlayedCount +=1
+
+# add all new song to the list of music
+#tempList = likedList+unlikedList+skippedList+unsureList
+#temp = consolidateSongLists(unlikedList, songDataTuple[0], 0)
+#temp = consolidateSongLists(likeList, songDataTuple[0], 1)
+#temp = consolidateSongLists(skippedList, songDataTuple[0], 2)
+#temp = consolidateSongLists(unsureList, songDataTuple[0], 3)
+
+# re-fit the data based on new input
+#model = getNBayes(allSongData[0], classifications)
+
+
+
+
