@@ -6,7 +6,7 @@ from sklearn.naive_bayes import GaussianNB
 # Read in JSON file with song and their attributes
 songs = json.load(open('songs.json'))
 # Example printing the first song's danceability
-print(songs[0]['body']['danceability'])
+#print(songs[0]['body'])
 
 # K-Means Clustering function for clustering songs based on attributes
 # vectors is a list of lists of song attributes
@@ -43,6 +43,24 @@ def KMeansCluster(vectors, num_clusters):
 #KMeansCluster(points, nClusters)
 
 # put in a list of all of new songs and to classify them as unsure
+def convertJson():
+    songList = []
+    for i in range(len(songs)):
+        attributeList = []
+        attributeList.append(songs[i]['body']['danceability'])
+        attributeList.append(songs[i]['body']['energy'])
+        attributeList.append(songs[i]['body']['key'])
+        attributeList.append(songs[i]['body']['loudness'])
+        attributeList.append(songs[i]['body']['mode'])
+        attributeList.append(songs[i]['body']['speechiness'])
+        attributeList.append(songs[i]['body']['acousticness'])
+        attributeList.append(songs[i]['body']['instrumentalness'])
+        attributeList.append(songs[i]['body']['liveness'])
+        attributeList.append(songs[i]['body']['valence'])
+        attributeList.append(songs[i]['body']['tempo'])
+        songList.append(attributeList)
+    return songList
+
 def initializePlaylistSongs(songList):
     #vectors = []
     classification = []
@@ -113,21 +131,21 @@ def getReccomendationLists(clusters, model):
     return (unlikedList, likedList, unsureList, skippedList)
 
 # Example
-x = np.array([[-3, 7], [1, 5], [1, 2], [-2, 0], [2, 3], [-4, 0], [-1, 1], [1, 1], [-2, 2], [2, 7], [-4, 1], [-2, 7]])
-
+songList = convertJson()
 # only run once to get initial songs classified
-songClassifications = initializePlaylistSongs(x)
+songClassifications = initializePlaylistSongs(songList)
 print("Song Classifications")
-print(songClassifications)
+#print(songClassifications)
+#print(songs)
 
 # cluster the songs 
-num_clusters = 3
-clusters = KMeansCluster(x, num_clusters)
+num_clusters = 6
+clusters = KMeansCluster(songList, num_clusters)
 print('cluster centers:')
 print(clusters)
 
 # create a new model based off these songs
-model = getNBayes(x, songClassifications)
+model = getNBayes(songList, songClassifications)
 
 # display the reccomended songs
 tup = getReccomendationLists(clusters, model)
@@ -139,6 +157,7 @@ print(len(tup[2])," POTENTIAL SONGS")
 print(tup[2])
 print(len(tup[3])," SKIPPED SONGS")
 print(tup[3])
+
 
 # pick a random song from the highest priority classification list and play that song
 #alreadyPlayed.append(likedList.pop(0))
