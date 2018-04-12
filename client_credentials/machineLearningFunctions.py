@@ -1,6 +1,12 @@
 import numpy as np
 import tensorflow as tf
+import json
 from sklearn.naive_bayes import GaussianNB
+
+# Read in JSON file with song and their attributes
+songs = json.load(open('songs.json'))
+# Example printing the first song's danceability
+print(songs[0]['body']['danceability'])
 
 # K-Means Clustering function for clustering songs based on attributes
 # vectors is a list of lists of song attributes
