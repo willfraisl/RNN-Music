@@ -1,12 +1,13 @@
 import numpy as np
 import tensorflow as tf
+import pandas as pd
 import json
 from sklearn.naive_bayes import GaussianNB
 
 # Read in JSON file with song and their attributes
-songs = json.load(open('songs.json'))
+#songs = json.load(open('songs.json'))
 # Example printing the first song's danceability
-#print(songs[0]['body'])
+#print(songs[0])
 
 # K-Means Clustering function for clustering songs based on attributes
 # vectors is a list of lists of song attributes
@@ -32,8 +33,11 @@ def KMeansCluster(vectors, num_clusters):
       kmeans.train(input_fn)
       cluster_centers = kmeans.cluster_centers()
       previous_centers = cluster_centers
+    
+    # convert the clusters to json format
+    clustersToJSON(cluster_centers)
+    
     return cluster_centers
-
 
 # Example
 #num_points = 100
@@ -43,7 +47,8 @@ def KMeansCluster(vectors, num_clusters):
 #KMeansCluster(points, nClusters)
 
 # put in a list of all of new songs and to classify them as unsure
-def convertJson():
+def JSONtoVectorList(fileName):
+    songs = json.load(open(fileName))
     songList = []
     for i in range(len(songs)):
         attributeList = []
@@ -101,10 +106,23 @@ def consolidateSongLists(list1, list2):
                 consolidatedList.append(list1[i])
     return consolidatedList
 
+    
+def clustersToJSON(clusters):
+    data = {}
+    data['cluster'] = []
+    for cluster in clusters:
+        cluster = np.array(cluster).tolist()
+        #danceability,energy,key,loudness,mode,speechiness,acousticness,instrumentalness,liveness,valence,tempo
+        data['cluster'].append({"danceability": cluster[0],"energy": cluster[1],"key": cluster[2],"loudness": cluster[3], 
+        "mode": cluster[4],"speechiness": cluster[5],"acousticness": cluster[6],"instrumentalness": cluster[7],
+        "liveness": cluster[8],"valence":cluster[9],"tempo":cluster[10]})
+
+    with open('clusters.json', 'w') as file:
+        json.dump(data, file)
 
 # consolidate the predicted classification of spotify's reccomendations
 # for each cluster of data into the three classification lists 
-def getReccomendationLists(clusters, model):
+def getReccomendationLists(songs, model):
     # create lists of potential songs seperated by priority
     unlikedList = []
     likedList = []
@@ -112,13 +130,13 @@ def getReccomendationLists(clusters, model):
     skippedList = []
     alreadyPlayed = []
 
-    for i in range(len(clusters)):
+    for i in range(len(songs)):
         #songs = getSpotifySeeds(clusters[i])
 
         # mock list of returned potential songs
-        songs = [clusters[i]]
-        songPredictions = predictSongs(model, songs)
-        for j in range(len(songPredictions)):
+        #songs = [clusters[i]]
+        #songPredictions = predictSongs(model, songs)
+        for j in range(len(songs[i])):
             if songPredictions[j] == 0:
                 unlikedList.append(songPredictions[j])
             elif songPredictions[j] == 1:
@@ -131,7 +149,7 @@ def getReccomendationLists(clusters, model):
     return (unlikedList, likedList, unsureList, skippedList)
 
 # Example
-songList = convertJson()
+songList = JSONtoVectorList('songs.json')
 # only run once to get initial songs classified
 songClassifications = initializePlaylistSongs(songList)
 print("Song Classifications")
@@ -141,12 +159,16 @@ print("Song Classifications")
 # cluster the songs 
 num_clusters = 6
 clusters = KMeansCluster(songList, num_clusters)
-print('cluster centers:')
-print(clusters)
+
+print('Cluster Centers:')
+cluster_centers = json.load(open('clusters.json'))
+for i in range(len(clusters)):
+    print(cluster_centers['cluster'][i])
+    print()
 
 # create a new model based off these songs
 model = getNBayes(songList, songClassifications)
-
+"""
 # display the reccomended songs
 tup = getReccomendationLists(clusters, model)
 print(len(tup[0])," UNLIKED SONGS")
@@ -157,7 +179,7 @@ print(len(tup[2])," POTENTIAL SONGS")
 print(tup[2])
 print(len(tup[3])," SKIPPED SONGS")
 print(tup[3])
-
+"""
 
 # pick a random song from the highest priority classification list and play that song
 #alreadyPlayed.append(likedList.pop(0))
