@@ -1,49 +1,16 @@
 <!doctype html>
 <html>
   <script type="text/javascript" src="app.js"></script>
-  <script type="text/javascript" src="SecretData.js"></script>
-  <script type="text/javascript" src="spotifyFunctions.js"></script>
   <head>
     <title>RNN-Music</title>
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
-    <style type="text/css">
-      #login, #loggedin {
-        display: none;
-      }
-      .text-overflow {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        width: 500px;
-      }
-    </style>
   </head>
 
   <body>
     <div class="container">
       <div id="search">
         <h1>RNN-Music</h1>
-        <form>
-          Song/Artist: <input type="text" name="entry">
-          
-          <input type="button" value="Create Station" onclick="myFunction()">
-          <p id="demo"></p>
-          <script>
-            function myFunction(){
-              //this works
-              //document.getElementById("demo").innerHTML = "test";
-              
-              // W.I.P
-              // trying to get this to display data from a spotify function, but it doesn't work 
-              
-              //getAudioFeaturesForTrack('4tgJDSBLGNnDZC3BOTJAuy', function(data){ 
-              // document.getElementById("demo").innerHTML = "data.body";
-              //});
-              // next step is to use the search field to search for data for a specific song and display it
-            
-            }
-          </script>
-        </form>
+        <button type="button" onclick="test()">test</button>
+        <p id="test_text">button not pushed</p>
       </div>
   </body>
 </html>

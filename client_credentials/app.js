@@ -16,6 +16,10 @@ var spotifyApi = new SpotifyWebApi({
   redirectUri : 'http://localhost:8888/callback'
 });
 
+function test(){
+  document.getElementById("test_text").innerHTML = "button pushed";
+}
+
 spotifyApi.clientCredentialsGrant()
   .then(token => {
     spotifyApi.setAccessToken(token.body.access_token);
@@ -32,7 +36,7 @@ spotifyApi.clientCredentialsGrant()
       if (err) {
         return console.log(err);
       }
-      console.log("The file was saved!");
+      console.log("Seed songs saved in json");
     });
   })
   .catch(err => {
