@@ -1,0 +1,69 @@
+# in => a string containing the name of the file 'songs.json'
+# out => a json file with clusters 'clusters.json'
+
+def JSONtoVectorList(fileName):
+    songs = json.load(open(fileName))
+    songList = []
+    for i in range(len(songs)):
+        attributeList = []
+        attributeList.append(songs[i]['body']['danceability'])
+        attributeList.append(songs[i]['body']['energy'])
+        attributeList.append(songs[i]['body']['key'])
+        attributeList.append(songs[i]['body']['loudness'])
+        attributeList.append(songs[i]['body']['mode'])
+        attributeList.append(songs[i]['body']['speechiness'])
+        attributeList.append(songs[i]['body']['acousticness'])
+        attributeList.append(songs[i]['body']['instrumentalness'])
+        attributeList.append(songs[i]['body']['liveness'])
+        attributeList.append(songs[i]['body']['valence'])
+        attributeList.append(songs[i]['body']['tempo'])
+        songList.append(attributeList)
+    return songList
+
+def initializePlaylistSongs(songList):
+    #vectors = []
+    classification = []
+    for i in range(len(songList)):
+        #vectors.append(songList[i])
+        classification.append(2)
+    return classification
+
+def KMeansCluster(vectors, num_clusters):
+
+    num_clusters = int(num_clusters)
+    assert num_clusters < len(vectors)
+
+    # Find out the dimensionality
+    dim = len(vectors[0])
+
+    def input_fn():
+        return tf.train.limit_epochs(
+            tf.convert_to_tensor(vectors, dtype=tf.float32), num_epochs=1)
+
+    kmeans = tf.contrib.factorization.KMeansClustering(
+        num_clusters=num_clusters, use_mini_batch=False)
+    # train
+    num_iterations = 10
+    previous_centers = None
+    for _ in range(num_iterations):
+      kmeans.train(input_fn)
+      cluster_centers = kmeans.cluster_centers()
+      previous_centers = cluster_centers
+    
+    # convert the clusters to json format
+    clustersToJSON(cluster_centers)
+    
+    return cluster_centers
+
+# a string containing the name of the file 'songs.jason'
+songsJson = sys.argv[1]
+
+songList = JSONtoVectorList(songsJson)
+# only run once to get initial songs classified
+songClassifications = initializePlaylistSongs(songList)
+
+# cluster the songs 
+num_clusters = 6
+clusters = KMeansCluster(songList, num_clusters)
+cluster_centers = json.load(open('clusters.json'))
+print(cluster_centers)
