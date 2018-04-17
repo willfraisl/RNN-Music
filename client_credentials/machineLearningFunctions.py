@@ -2,6 +2,7 @@ import numpy as np
 import tensorflow as tf
 import pandas as pd
 import json
+import sys
 from sklearn.naive_bayes import GaussianNB
 
 # Read in JSON file with song and their attributes
@@ -194,7 +195,5 @@ print(tup[3])
 
 # re-fit the data based on new input
 #model = getNBayes(allSongData[0], classifications)
-
-
 
 

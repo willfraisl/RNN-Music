@@ -1,5 +1,11 @@
 # in => a string containing the name of the file 'songs.json'
 # out => a json file with clusters 'clusters.json'
+import sys
+import numpy as np
+import tensorflow as tf
+import pandas as pd
+import json
+from sklearn.naive_bayes import GaussianNB
 
 def JSONtoVectorList(fileName):
     songs = json.load(open(fileName))
