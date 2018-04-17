@@ -28,6 +28,19 @@ def initializePlaylistSongs(songList):
         classification.append(2)
     return classification
 
+def clustersToJSON(clusters):
+    data = {}
+    data['cluster'] = []
+    for cluster in clusters:
+        cluster = np.array(cluster).tolist()
+        #danceability,energy,key,loudness,mode,speechiness,acousticness,instrumentalness,liveness,valence,tempo
+        data['cluster'].append({"danceability": cluster[0],"energy": cluster[1],"key": cluster[2],"loudness": cluster[3], 
+        "mode": cluster[4],"speechiness": cluster[5],"acousticness": cluster[6],"instrumentalness": cluster[7],
+        "liveness": cluster[8],"valence":cluster[9],"tempo":cluster[10]})
+
+    with open('clusters.json', 'w') as file:
+        json.dump(data, file)
+        
 def KMeansCluster(vectors, num_clusters):
 
     num_clusters = int(num_clusters)
