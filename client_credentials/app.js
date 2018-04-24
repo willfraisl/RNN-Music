@@ -50,7 +50,7 @@ function seedPlaylist(userID, playlistID){
       console.log('error! ' + err);
     });
 }
-
+/*
 function getSongsFromSeed(clusterJson){
   spotifyApi.getRecommendations()
   .then(data => {
@@ -70,7 +70,7 @@ function getSongsFromSeed(clusterJson){
   .catch(err => {
     console.log('error ' + err);
   })
-  */
+  
 }
 
 spotifyApi.clientCredentialsGrant()
@@ -86,7 +86,7 @@ spotifyApi.clientCredentialsGrant()
   });
 
 seedPlaylist('124632828', '6X2OFVuHppo7uZHPjfJitd');
-
+*/
 var app = express();
 app.use(express.static(__dirname));
 console.log('Listening on 8888');
