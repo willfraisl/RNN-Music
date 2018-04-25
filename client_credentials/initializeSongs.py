@@ -1,3 +1,5 @@
+# in => a string containing the name of the file 'songs.json' (initial playlist)
+# out => a json file with added songs 'allSongs.json' (official songs and data)
 import numpy as np
 import tensorflow as tf
 import pandas as pd
@@ -41,15 +43,6 @@ def songsToJSON(songs):
     with open('allSongs.json', 'w') as file:
         json.dump(data, file)
 
-def initializePlaylistSongs(songList):
-    #vectors = []
-    classification = []
-    for i in range(len(songList)):
-        #vectors.append(songList[i])
-        classification.append(2)
-    return classification
-#print('songs.json')
 songList = JSONtoVectorList('songs.json')
 songsToJSON(songList)
-#songClassifications = initializePlaylistSongs(songList)
 
