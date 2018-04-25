@@ -56,19 +56,21 @@ def getReccomendationLists(clustersReccomendations, model):
     skippedList = []
     alreadyPlayed = []
     for i in range(len(clustersReccomendations)):
-        tup = JSONtoVectorList(clustersReccomendations)
+        tup = JSONtoVectorList('allSongs.json')
         songList = tup[0]
         songTokenList = tup[1]
-        songClassifications = tup[2] 
+        songClassifications = tup[2]
+
         songPredictions = predictSongs(model, songList)
+        clustersReccomendations = json.load(open('allSongs.json'))
         for j in range(len(songPredictions)):
-            if songPredictions[j] == 0 and not unlikedList.__contains__(clustersReccomendations[j]):
+            if songPredictions[j] == 0 and not unlikedList.__contains__(clustersReccomendations['songs'][j]):
                 unlikedList.append(clustersReccomendations['songs'][j])
-            elif songPredictions[j] == 1 and not likedList.__contains__(clustersReccomendations[j]):
+            elif songPredictions[j] == 1 and not likedList.__contains__(clustersReccomendations['songs'][j]):
                 likedList.append(clustersReccomendations['songs'][j])
-            elif songPredictions[j] == 2 and not unsureList.__contains__(clustersReccomendations[j]):
+            elif songPredictions[j] == 2 and not unsureList.__contains__(clustersReccomendations['songs'][j]):
                 unsureList.append(clustersReccomendations['songs'][j])
-            elif songPredictions[j] == 3 and not skippedList.__contains__(clustersReccomendations[j]):
+            elif songPredictions[j] == 3 and not skippedList.__contains__(clustersReccomendations['songs'][j]):
                 skippedList.append(clustersReccomendations['songs'][j])
 
     return (likedList,unsureList,skippedList, unlikedList)

@@ -1,17 +1,1 @@
-{
-    "key": "2Gy7qnDwt8Z3MNxqat4CsK",
-    "attributes": {
-        "danceability": "0.392",
-        "energy": "0.629",
-        "key": "5",
-        "loudness": "-7.056",
-        "mode": "1",
-        "speechiness": "0.0335",
-        "acousticness": "0.718",
-        "instrumentalness": "3.76e-06",
-        "liveness": "0.129",
-        "valence": "0.72",
-        "tempo": "124.511"
-    },
-    "classification": 2
-}
+{"key": "2Gy7qnDwt8Z3MNxqat4CsK", "attributes": {"danceability": "0.392", "energy": "0.629", "key": "5", "loudness": "-7.056", "mode": "1", "speechiness": "0.0335", "acousticness": "0.718", "instrumentalness": "3.76e-06", "liveness": "0.129", "valence": "0.72", "tempo": "124.511"}, "classification": 2}
