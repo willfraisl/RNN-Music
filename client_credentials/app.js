@@ -20,7 +20,6 @@ var spotifyApi = new SpotifyWebApi({
 function test(){
   document.getElementById("test_text").innerHTML = "button pushed";
 }
-
 function seedPlaylist(userID, playlistID){
   spotifyApi.clientCredentialsGrant()
     .then(token => {
@@ -28,66 +27,74 @@ function seedPlaylist(userID, playlistID){
       return spotifyApi.getPlaylistTracks(userID, playlistID);
     })
     .then(playlistTracks => {
-      return Promise.all(playlistTracks.body.items.map(item => {
-        return spotifyApi.getAudioFeaturesForTrack(item.track.id);
-      }))
+      return  spotifyApi.getAudioFeaturesForTracks(playlistTracks.body.items.map(item => item.track.id));
     })
     .then(songsAttributes => {
       //save to file here
+      console.log("got attributes");
       fs.writeFile("songs.json", JSON.stringify(songsAttributes), 'utf8', function (err) {
         if (err) {
           return console.log(err);
         }
         const clusterSongs = spawn('python3', ['clusterSongs.py', 'songs.json']);
         clusterSongs.on('close', (code) => {
-          console.log(`child process exited with code ${code}`);
+          //console.log(`child process exited with code ${code}`);
           var clusters = JSON.parse(fs.readFileSync('clusters.json', 'utf8'));
           getSongsFromSeed(clusters);
         });
+        console.log("clustered songs");
       });
     })
     .catch(err => {
       console.log('error! ' + err);
     });
 }
-/*
+
 function getSongsFromSeed(clusterJson){
-  spotifyApi.getRecommendations()
-  .then(data => {
-    console.log(data);
-  })
-  .catch(err => {
-    console.log('error ' + err);
-  });
-  /*
-  Promise.all(clusterJson.cluster.map(i => {
-    console.log(i.danceability);
-    return spotifyApi.getRecommendations({target_danceability: i.danceability});
-  }))
-  .then(data => {
-    console.log(data);
-  })
-  .catch(err => {
-    console.log('error ' + err);
-  })
+  var data0 = {};
+  var clusterRecommendations = 'clusterRecommendations';
+  data0[clusterRecommendations] = [];
+  var count = 0;
   
+  for(var i = 0; i<6;i++){
+    spotifyApi.getRecommendations(clusterJson['cluster'][count]).then(data => {  
+      var songs = [];
+      spotifyApi.getAudioFeaturesForTracks(data['body']['tracks'].map(item => item.id)).then(attributes => {
+        var count2 = 0;
+        for(var j = 0; j < data['body']['tracks'].length; j++){
+          songs.push({"token": data['body']['tracks'][count2]['id'],"attributes": attributes.body.audio_features[count2],"classification": 2});
+          count2++;
+        }
+        data0[clusterRecommendations].push({songs});
+        fs.writeFile("newSongs.json", JSON.stringify(data0), function (err) {
+          if(err){
+            throw err;
+          }
+        });
+        console.log("Reccomendations fetched for cluster " + count);
+        count++;
+      }).catch(err => {
+        console.log('error! ' + err);
+      }); 
+    }).catch(err => {
+      console.log('error ' + err);
+    });
+  }
+  classifySongs();
 }
 
-spotifyApi.clientCredentialsGrant()
-  .then(token => {
-    spotifyApi.setAccessToken(token.body.access_token);
-    return spotifyApi.getRecommendations({ min_energy: 0.4, seed_artists: [], min_popularity: 50 });
-  })
-  .then(data => {
-    console.log(data);
-  })
-  .catch(err => {
-    console.log('error' + err);
+function classifySongs(){
+  const classifySongs = spawn('python3', ['classifySongs.py', 'songs.json']);
+  classifySongs.on('close', (code) => {
+    //console.log(`child process exited with code ${code}`);
+    var song = JSON.parse(fs.readFileSync('nextSong.json', 'utf8'));
+    console.log(song);
   });
+}
 
 seedPlaylist('124632828', '6X2OFVuHppo7uZHPjfJitd');
-*/
+
 var app = express();
 app.use(express.static(__dirname));
 console.log('Listening on 8888');
-app.listen(8888);
+//app.listen(8888);

@@ -38,7 +38,7 @@ def clustersToJSON(clusters, tokens):
     for cluster in clusters:
         cluster = np.array(cluster).tolist()
         #danceability,energy,key,loudness,mode,speechiness,acousticness,instrumentalness,liveness,valence,tempo
-        data['cluster'].append({"seed_tracks":tokens[count],"danceability": cluster[0],"energy": cluster[1],"key": cluster[2],"loudness": cluster[3], 
+        data['cluster'].append({"limit":100,"seed_tracks":tokens[count],"danceability": cluster[0],"energy": cluster[1],"key": cluster[2],"loudness": cluster[3], 
         "mode": cluster[4],"speechiness": cluster[5],"acousticness": cluster[6],"instrumentalness": cluster[7],
         "liveness": cluster[8],"valence":cluster[9],"tempo":cluster[10]})
         count+=1
