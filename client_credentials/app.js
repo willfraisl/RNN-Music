@@ -62,7 +62,13 @@ function getSongsFromSeed(clusterJson){
       spotifyApi.getAudioFeaturesForTracks(data['body']['tracks'].map(item => item.id)).then(attributes => {
         var count2 = 0;
         for(var j = 0; j < data['body']['tracks'].length; j++){
-          songs.push({"token": data['body']['tracks'][count2]['id'],"attributes": attributes.body.audio_features[count2],"classification": 2});
+          songs.push({
+            "name":data['body']['tracks'][count2]['name'],
+            "artist": data['body']['tracks'][count2]['artists'][0]['name'],
+            "token": data['body']['tracks'][count2]['id'],
+            "previewURL":data['body']['tracks'][count2]['preview_url'],
+            "attributes": attributes.body.audio_features[count2],
+            "classification": 2});
           count2++;
         }
         data0[clusterRecommendations].push({songs});
@@ -96,5 +102,5 @@ seedPlaylist('124632828', '6X2OFVuHppo7uZHPjfJitd');
 
 var app = express();
 app.use(express.static(__dirname));
-console.log('Listening on 8888');
+//console.log('Listening on 8888');
 //app.listen(8888);
