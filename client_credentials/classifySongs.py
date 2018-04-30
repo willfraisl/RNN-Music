@@ -109,8 +109,26 @@ model = getNBayes(songList, songClassifications)
 reccomendationLists = getReccomendationLists('newSongs.json', model)
 
 song = []
-if len(reccomendationLists[0]) > 0:
-    songs = json.load(open('allSongs.json'))
+
+for i in range(len(reccomendationLists)):
+    if len(reccomendationLists[i]) > 0:
+        songs = json.load(open('pastSongs.json'))
+        for j in range(len(reccomendationLists[i])):
+            inList = False
+            for k in range(len(songs['songs'])):
+                if songs['songs'][k]['token'] == reccomendationLists[i][j]['token']:
+                    inList = True
+            if not inList:
+                song = reccomendationLists[i][j]
+                break
+
+print(song)
+with open('nextSong.json', 'w') as file:
+    json.dump(song, file)
+
+
+'''if len(reccomendationLists[0]) > 0:
+    songs = json.load(open('pastSongs.json'))
     for i in range(len(reccomendationLists[0])):
         inList = False
         for j in range(len(songs['songs'])):
@@ -123,7 +141,7 @@ if len(reccomendationLists[0]) > 0:
             song = reccomendationLists[0][0]
 
 elif len(reccomendationLists[1])> 0:
-    songs = json.load(open('allSongs.json'))
+    songs = json.load(open('pastSongs.json'))
     for i in range(len(reccomendationLists[1])):
         inList = False
         for j in range(len(songs['songs'])):
@@ -136,11 +154,11 @@ elif len(reccomendationLists[1])> 0:
             song = reccomendationLists[1][0]
 
 elif len(reccomendationLists[2]) > 0:
-    songs = json.load(open('allSongs.json'))
+    songs = json.load(open('pastSongs.json'))
     for i in range(len(reccomendationLists[2])):
         inList = False
         for j in range(len(songs['songs'])):
-            if songs['songs'][j]['token'] == reccomendationLists[3][i]['token']:
+            if songs['songs'][j]['token'] == reccomendationLists[2][i]['token']:
                 inList = True
         if not inList:
             song = reccomendationLists[2][i]
@@ -150,7 +168,7 @@ elif len(reccomendationLists[2]) > 0:
             song = reccomendationLists[2][0]
 
 else:
-    songs = json.load(open('allSongs.json'))
+    songs = json.load(open('pastSongs.json'))
     for i in range(len(reccomendationLists[2])):
         inList = False
         for j in range(len(songs['songs'])):
@@ -161,8 +179,4 @@ else:
             print(song)
             break
         else:
-            song = reccomendationLists[3][0]
-
-print(song)
-with open('nextSong.json', 'w') as file:
-    json.dump(song, file)
+            song = reccomendationLists[3][0]'''

@@ -61,7 +61,7 @@ async function getSongsFromSeed(clusterJson){
   for(var i = 0; i<6;i++){
     await spotifyApi.getRecommendations(clusterJson['cluster'][count]).then(data => {  
       var songs = [];
-       spotifyApi.getAudioFeaturesForTracks(data['body']['tracks'].map(item => item.id)).then(attributes => {
+      spotifyApi.getAudioFeaturesForTracks(data['body']['tracks'].map(item => item.id)).then(attributes => {
         var count2 = 0;
         for(var j = 0; j < data['body']['tracks'].length; j++){
           songs.push({
@@ -92,6 +92,7 @@ async function getSongsFromSeed(clusterJson){
 
 function addSong(song, classification){
   var allSongs = JSON.parse(fs.readFileSync('allSongs.json', 'utf8'));
+  var pastSongs = JSON.parse(fs.readFileSync('pastSongs.json', 'utf8'));
   songInlist = false;
 
   // update songs classification if it is not new
@@ -121,8 +122,18 @@ function addSong(song, classification){
         "tempo":song.attributes.tempo},
       "classification": classification});
   }
-  // update the json file
   fs.writeFile("allSongs.json", JSON.stringify(allSongs), 'utf8', function (err) {
+    if (err) {
+      return console.log(err);
+    }
+  });
+
+  pastSongs.songs.push({
+    "token": song.token,
+    "classification": classification});
+
+  // update the json file
+  fs.writeFile("pastSongs.json", JSON.stringify(pastSongs), 'utf8', function (err) {
     if (err) {
       return console.log(err);
     }
@@ -188,36 +199,48 @@ function clusterSongs() {
   });
 }
 
+function initializeSongs() {
+  seedPlaylist('124632828', '6X2OFVuHppo7uZHPjfJitd');
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve("initialized songs");
+    }, 2000);
+  });
+}
+
 async function mainLoop() {
-  var firstLoop = true;
+  x = await initializeSongs();
+  console.log(x)
   while(true){
-    if(firstLoop == true){
-      firstLoop = false;
-      await seedPlaylist('124632828', '6X2OFVuHppo7uZHPjfJitd');
-    } else {
-      var x = await clusterSongs();
-      console.log(x);
+    var x = await clusterSongs();
+    console.log(x);
 
-      var clusters = JSON.parse(fs.readFileSync('clusters.json', 'utf8'));
-      x = await getSongsFromSeed(clusters);
+    var clusters = JSON.parse(fs.readFileSync('clusters.json', 'utf8'));
+    x = await getSongsFromSeed(clusters);
 
-      x = await classifySongs();
-      console.log(x);
+    x = await classifySongs();
+    console.log(x);
 
-      var song = JSON.parse(fs.readFileSync('nextSong.json', 'utf8'));
-      x = await getUserInput(song);
-    }
+    var song = JSON.parse(fs.readFileSync('nextSong.json', 'utf8'));
+    x = await getUserInput(song);
   }
 }
 
 // clear the previous data
-allSongs = {}
+allSongs = {};
 fs.writeFile("allSongs.json", JSON.stringify(allSongs), 'utf8', function (err) {
   if (err) {
     return console.log(err);
   }
 });
 
+pastSongs = {};
+pastSongs['songs'] = [];
+fs.writeFile("pastSongs.json", JSON.stringify(pastSongs), 'utf8', function (err) {
+  if (err) {
+    return console.log(err);
+  }
+});
 mainLoop();
 
 var app = express();

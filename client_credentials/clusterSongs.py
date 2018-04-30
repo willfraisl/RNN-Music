@@ -10,6 +10,7 @@ from sklearn.naive_bayes import GaussianNB
 
 def JSONtoVectorList(fileName):
     songs = json.load(open(fileName))
+    print(songs)
     songList = []
     songTokenList = []
     songClassificationList = []
