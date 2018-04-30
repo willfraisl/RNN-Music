@@ -26,7 +26,7 @@ def JSONtoVectorList(fileName):
         attributeList.append(float(songs['songs'][i]['attributes']['liveness']))
         attributeList.append(float(songs['songs'][i]['attributes']['valence']))
         attributeList.append(float(songs['songs'][i]['attributes']['tempo']))
-        songTokenList.append(songs['songs'][i]['key'])
+        songTokenList.append(songs['songs'][i]['token'])
         songClassificationList.append(songs['songs'][i]['classification'])
         songList.append(attributeList)
     return (songList, songTokenList, songClassificationList)
@@ -114,7 +114,7 @@ if len(reccomendationLists[0]) > 0:
     for i in range(len(reccomendationLists[0])):
         inList = False
         for j in range(len(songs['songs'])):
-            if songs['songs'][j]['key'] == reccomendationLists[0][i]['token']:
+            if songs['songs'][j]['token'] == reccomendationLists[0][i]['token']:
                 inList = True
         if not inList:
             song = reccomendationLists[0][i]
@@ -127,7 +127,7 @@ elif len(reccomendationLists[1])> 0:
     for i in range(len(reccomendationLists[1])):
         inList = False
         for j in range(len(songs['songs'])):
-            if songs['songs'][j]['key'] == reccomendationLists[1][i]['token']:
+            if songs['songs'][j]['token'] == reccomendationLists[1][i]['token']:
                 inList = True
         if not inList:
             song = reccomendationLists[1][i]
@@ -140,7 +140,7 @@ elif len(reccomendationLists[2]) > 0:
     for i in range(len(reccomendationLists[2])):
         inList = False
         for j in range(len(songs['songs'])):
-            if songs['songs'][j]['key'] == reccomendationLists[3][i]['token']:
+            if songs['songs'][j]['token'] == reccomendationLists[3][i]['token']:
                 inList = True
         if not inList:
             song = reccomendationLists[2][i]
@@ -154,7 +154,7 @@ else:
     for i in range(len(reccomendationLists[2])):
         inList = False
         for j in range(len(songs['songs'])):
-            if songs['songs'][j]['key'] == reccomendationLists[3][i]['token']:
+            if songs['songs'][j]['token'] == reccomendationLists[3][i]['token']:
                 inList = True
         if not inList:
             song = reccomendationLists[3][i]

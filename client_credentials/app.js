@@ -7,9 +7,10 @@
 var express = require('express'); // Express web server framework
 var request = require('request'); // "Request" library
 const readline = require('readline-sync');
+var PythonShell = require('python-shell');
 var fs = require('fs');
 var SpotifyWebApi = require('spotify-web-api-node');
-const {spawn} = require("child_process");
+const {exec} = require("child_process");
 
 // credentials
 var spotifyApi = new SpotifyWebApi({
@@ -37,14 +38,13 @@ function seedPlaylist(userID, playlistID){
       fs.writeFile("songs.json", JSON.stringify(songsAttributes), 'utf8', function (err) {
         if (err) {
           return console.log(err);
-        }
-        /*const clusterSongs = spawn('python3', ['clusterSongs.py', 'songs.json']);
-        clusterSongs.on('close', (code) => {
-          //console.log(`child process exited with code ${code}`);
-          var clusters = JSON.parse(fs.readFileSync('clusters.json', 'utf8'));
-          getSongsFromSeed(clusters);
-        });*/
-        //console.log("clustered songs");
+        }   
+        const initializeSongs = exec('/Library/Frameworks/Python.framework/Versions/3.6/bin/python3 initializeSongs.py', (error, stdout, stderr) => {
+          if (error) {
+            console.error(`exec error: ${error}`);
+            return;
+          }
+        });
       });
     })
     .catch(err => {
@@ -52,16 +52,16 @@ function seedPlaylist(userID, playlistID){
     });
 }
 
-function getSongsFromSeed(clusterJson){
+async function getSongsFromSeed(clusterJson){
   var data0 = {};
   var clusterRecommendations = 'clusterRecommendations';
   data0[clusterRecommendations] = [];
   var count = 0;
   
   for(var i = 0; i<6;i++){
-    spotifyApi.getRecommendations(clusterJson['cluster'][count]).then(data => {  
+    await spotifyApi.getRecommendations(clusterJson['cluster'][count]).then(data => {  
       var songs = [];
-      spotifyApi.getAudioFeaturesForTracks(data['body']['tracks'].map(item => item.id)).then(attributes => {
+       spotifyApi.getAudioFeaturesForTracks(data['body']['tracks'].map(item => item.id)).then(attributes => {
         var count2 = 0;
         for(var j = 0; j < data['body']['tracks'].length; j++){
           songs.push({
@@ -88,10 +88,6 @@ function getSongsFromSeed(clusterJson){
       console.log('error ' + err);
     });
   }
-
-  classifySongs(function(song){
-    getUserInput(song);
-  });
 }
 
 function addSong(song, classification){
@@ -100,7 +96,7 @@ function addSong(song, classification){
 
   // update songs classification if it is not new
   for(i = 0; i < allSongs.songs.length; i++){
-    if(allSongs.songs[i].key == song.token){
+    if(allSongs.songs[i].token == song.token){
       allSongs.songs[i].classification = classification;
       songInlist = true;
       break;
@@ -110,7 +106,7 @@ function addSong(song, classification){
   // add song to list if it is new
   if(songInlist == false){
     allSongs.songs.push({
-      "key": song.token,
+      "token": song.token,
       "attributes": {
         "danceability": song.attributes.danceability,
         "energy": song.attributes.energy,
@@ -162,25 +158,28 @@ function getUserInput(song){
   addSong(song, userInput)
 }
 
-
-function classifySongs(callback){
+function classifySongs(){
   //run python code to get the next song
-  const classifySongs = spawn('python3', ['classifySongs.py', 'songs.json']);
-  classifySongs.on('close', (code) => {
-    //console.log(`child process exited with code ${code}`);
-    var song = JSON.parse(fs.readFileSync('nextSong.json', 'utf8'));
-
-    //send song to callback
-    callback(song)
-  })
+  const classifySongs = exec('/Library/Frameworks/Python.framework/Versions/3.6/bin/python3 classifySongs.py', (error, stdout, stderr) => {
+    if (error) {
+      console.error(`exec error: ${error}`);
+      return;
+    }
+  });
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve("classified songs");
+    }, 2000);
+  });
 }
 
 function clusterSongs() { 
-  const clusterSongs = spawn('python3', ['clusterSongs.py', 'allSongs.json']);
-  clusterSongs.on('close', (code) => {
-    //console.log(`child process exited with code ${code}`);
-    var clusters = JSON.parse(fs.readFileSync('clusters.json', 'utf8'));
-    getSongsFromSeed(clusters);
+  //run python code to cluster the songs
+  const classifySongs = exec('/Library/Frameworks/Python.framework/Versions/3.6/bin/python3 clusterSongs.py', (error, stdout, stderr) => {
+    if (error) {
+      console.error(`exec error: ${error}`);
+      return;
+    }
   });
   return new Promise(resolve => {
     setTimeout(() => {
@@ -193,11 +192,20 @@ async function mainLoop() {
   var firstLoop = true;
   while(true){
     if(firstLoop == true){
-      seedPlaylist('124632828', '6X2OFVuHppo7uZHPjfJitd');
       firstLoop = false;
+      await seedPlaylist('124632828', '6X2OFVuHppo7uZHPjfJitd');
     } else {
       var x = await clusterSongs();
       console.log(x);
+
+      var clusters = JSON.parse(fs.readFileSync('clusters.json', 'utf8'));
+      x = await getSongsFromSeed(clusters);
+
+      x = await classifySongs();
+      console.log(x);
+
+      var song = JSON.parse(fs.readFileSync('nextSong.json', 'utf8'));
+      x = await getUserInput(song);
     }
   }
 }

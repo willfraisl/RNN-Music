@@ -26,7 +26,7 @@ def JSONtoVectorList(fileName):
         attributeList.append(songs['songs'][i]['attributes']['liveness'])
         attributeList.append(songs['songs'][i]['attributes']['valence'])
         attributeList.append(songs['songs'][i]['attributes']['tempo'])
-        songTokenList.append(songs['songs'][i]['key'])
+        songTokenList.append(songs['songs'][i]['token'])
         songClassificationList.append(songs['songs'][i]['classification'])
         songList.append(attributeList)
     return (songList, songTokenList, songClassificationList)
