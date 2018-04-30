@@ -8,6 +8,7 @@
     "express": "~4.16.0",
     "promise": "^8.0.1",
     "querystring": "~0.2.0",
+    "readline-sync": "^1.4.9",
     "request": "~2.83.0",
     "spotify-api-client": "0.0.3",
     "spotify-web-api-js": "^0.23.0",
