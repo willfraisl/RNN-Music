@@ -70,7 +70,7 @@ async function getSongsFromSeed(clusterJson){
             "token": data['body']['tracks'][count2]['id'],
             "previewURL":data['body']['tracks'][count2]['preview_url'],
             "attributes": attributes.body.audio_features[count2],
-            "classification": 2});
+            "classification": 1});
           count2++;
         }
         data0[clusterRecommendations].push({songs});
@@ -153,7 +153,7 @@ function getUserInput(song){
       break;
     } else if (input == "d"){
       console.log("Disliked");
-      userInput = 1
+      userInput = 3;
       break;
     } else if (input == "s"){
       console.log("Skipped");
@@ -161,7 +161,7 @@ function getUserInput(song){
       break
     } else if (input == "u"){
       console.log("Unsure");
-      userInput = 3;
+      userInput = 1;
       break
     }
   }
@@ -234,6 +234,11 @@ fs.writeFile("allSongs.json", JSON.stringify(allSongs), 'utf8', function (err) {
   }
 });
 
+var app = express();
+app.use(express.static(__dirname));
+//console.log('Listening on 8888');
+//app.listen(8888);
+
 pastSongs = {};
 pastSongs['songs'] = [];
 fs.writeFile("pastSongs.json", JSON.stringify(pastSongs), 'utf8', function (err) {
@@ -243,7 +248,3 @@ fs.writeFile("pastSongs.json", JSON.stringify(pastSongs), 'utf8', function (err)
 });
 mainLoop();
 
-var app = express();
-app.use(express.static(__dirname));
-//console.log('Listening on 8888');
-//app.listen(8888);

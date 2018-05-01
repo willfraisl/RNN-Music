@@ -27,6 +27,7 @@ def JSONtoVectorList(fileName):
         attributeList.append(songs['songs'][i]['attributes']['liveness'])
         attributeList.append(songs['songs'][i]['attributes']['valence'])
         attributeList.append(songs['songs'][i]['attributes']['tempo'])
+        attributeList.append(songs['songs'][i]['classification'])
         songTokenList.append(songs['songs'][i]['token'])
         songClassificationList.append(songs['songs'][i]['classification'])
         songList.append(attributeList)
@@ -39,8 +40,8 @@ def clustersToJSON(clusters, tokens):
     for cluster in clusters:
         cluster = np.array(cluster).tolist()
         #danceability,energy,key,loudness,mode,speechiness,acousticness,instrumentalness,liveness,valence,tempo
-        data['cluster'].append({"limit":100,"seed_tracks":tokens[count],"danceability": cluster[0],"energy": cluster[1],"key": cluster[2],"loudness": cluster[3], 
-        "mode": cluster[4],"speechiness": cluster[5],"acousticness": cluster[6],"instrumentalness": cluster[7],
+        data['cluster'].append({"limit":100,"seed_tracks":tokens[count],"danceability": cluster[0],"energy": cluster[1],"key": cluster[2],"loudness": cluster[3],
+        "popularity":100,"speechiness": cluster[5],"acousticness": cluster[6],"instrumentalness": cluster[7],
         "liveness": cluster[8],"valence":cluster[9],"tempo":cluster[10]})
         count+=1
     

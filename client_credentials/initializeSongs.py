@@ -39,7 +39,7 @@ def songsToJSON(songs):
         data2 = {"danceability": song[0],"energy": song[1],"key": song[2],"loudness": song[3], 
         "mode": song[4],"speechiness": song[5],"acousticness": song[6],"instrumentalness": song[7],
         "liveness": song[8],"valence":song[9],"tempo":song[10]}
-        data['songs'].append({'token':song[11],'attributes':data2,'classification':2})
+        data['songs'].append({'token':song[11],'attributes':data2,'classification':1})
  
     with open('allSongs.json', 'w') as file:
         json.dump(data, file)

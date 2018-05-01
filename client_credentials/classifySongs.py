@@ -6,6 +6,8 @@ import tensorflow as tf
 import pandas as pd
 import json
 import sys
+import random
+import webbrowser
 from sklearn.naive_bayes import GaussianNB
 
 def JSONtoVectorList(fileName):
@@ -90,16 +92,44 @@ def getReccomendationLists(clustersReccomendations, model):
         songClassifications = tup[2]
         songPredictions = predictSongs(model, songList)
         # condense all songs into respective lists, eliminating repeat songs
+        songs = json.load(open('pastSongs.json'))
         for j in range(len(songPredictions)):
-            if songPredictions[j] == 0 and not unlikedList.__contains__(clustersReccomendations['clusterRecommendations'][i]['songs'][j]):
-                unlikedList.append(clustersReccomendations['clusterRecommendations'][i]['songs'][j])
-            elif songPredictions[j] == 1 and not likedList.__contains__(clustersReccomendations['clusterRecommendations'][i]['songs'][j]):
-                likedList.append(clustersReccomendations['clusterRecommendations'][i]['songs'][j])
-            elif songPredictions[j] == 2 and not unsureList.__contains__(clustersReccomendations['clusterRecommendations'][i]['songs'][j]):
-                unsureList.append(clustersReccomendations['clusterRecommendations'][i]['songs'][j])
-            elif songPredictions[j] == 3 and not skippedList.__contains__(clustersReccomendations['clusterRecommendations'][i]['songs'][j]):
-                skippedList.append(clustersReccomendations['clusterRecommendations'][i]['songs'][j])
+            inList = False
+            for k in range(len(songs['songs'])):
+                if songs['songs'][k]['token'] == clustersReccomendations['clusterRecommendations'][i]['songs'][j]['token']:
+                    inList = True
+                    break
+            if(not inList):
+                if songPredictions[j] == 3 and not unlikedList.__contains__(clustersReccomendations['clusterRecommendations'][i]['songs'][j]):
+                    unlikedList.append(clustersReccomendations['clusterRecommendations'][i]['songs'][j])
+                elif songPredictions[j] == 0 and not likedList.__contains__(clustersReccomendations['clusterRecommendations'][i]['songs'][j]):
+                    likedList.append(clustersReccomendations['clusterRecommendations'][i]['songs'][j])
+                elif songPredictions[j] == 1 and not unsureList.__contains__(clustersReccomendations['clusterRecommendations'][i]['songs'][j]):
+                    unsureList.append(clustersReccomendations['clusterRecommendations'][i]['songs'][j])
+                elif songPredictions[j] == 2 and not skippedList.__contains__(clustersReccomendations['clusterRecommendations'][i]['songs'][j]):
+                    skippedList.append(clustersReccomendations['clusterRecommendations'][i]['songs'][j])
+            #else:
+            #    print("repeat")
     return (likedList,unsureList,skippedList, unlikedList)
+
+ # pick a song randomly from the top 10 or less songs
+def getNextSong(reccomendationLists):
+    for i in range(len(reccomendationLists)):
+        if len(reccomendationLists[i]) > 10:
+            j = random.randint(0,10)
+            song = reccomendationLists[i][j]
+            song['classification'] = i
+            return song
+        elif len(reccomendationLists[i]) > 1:
+            j = random.randint(0,len(reccomendationLists[i]))
+            song = reccomendationLists[i][j]
+            song['classification'] = i
+            return song
+        elif len(reccomendationLists[i]) > 0:
+            j = random.randint(0,len(reccomendationLists[i]))
+            song = reccomendationLists[i][0]
+            song['classification'] = i
+            return song
 
 tup = JSONtoVectorList('allSongs.json')
 songList = tup[0]
@@ -109,74 +139,14 @@ model = getNBayes(songList, songClassifications)
 reccomendationLists = getReccomendationLists('newSongs.json', model)
 
 song = []
+song = getNextSong(reccomendationLists)
 
-for i in range(len(reccomendationLists)):
-    if len(reccomendationLists[i]) > 0:
-        songs = json.load(open('pastSongs.json'))
-        for j in range(len(reccomendationLists[i])):
-            inList = False
-            for k in range(len(songs['songs'])):
-                if songs['songs'][k]['token'] == reccomendationLists[i][j]['token']:
-                    inList = True
-            if not inList:
-                song = reccomendationLists[i][j]
-                break
+# play the preview if available
+if song['previewURL'] != None:
+    chrome_path = 'open -a /Applications/Google\ Chrome.app %s'
+    webbrowser.get(chrome_path).open(song['previewURL'])
 
+songs = json.load(open('newSongs.json'))
 print(song)
 with open('nextSong.json', 'w') as file:
     json.dump(song, file)
-
-
-'''if len(reccomendationLists[0]) > 0:
-    songs = json.load(open('pastSongs.json'))
-    for i in range(len(reccomendationLists[0])):
-        inList = False
-        for j in range(len(songs['songs'])):
-            if songs['songs'][j]['token'] == reccomendationLists[0][i]['token']:
-                inList = True
-        if not inList:
-            song = reccomendationLists[0][i]
-            break
-        else:
-            song = reccomendationLists[0][0]
-
-elif len(reccomendationLists[1])> 0:
-    songs = json.load(open('pastSongs.json'))
-    for i in range(len(reccomendationLists[1])):
-        inList = False
-        for j in range(len(songs['songs'])):
-            if songs['songs'][j]['token'] == reccomendationLists[1][i]['token']:
-                inList = True
-        if not inList:
-            song = reccomendationLists[1][i]
-            break
-        else:
-            song = reccomendationLists[1][0]
-
-elif len(reccomendationLists[2]) > 0:
-    songs = json.load(open('pastSongs.json'))
-    for i in range(len(reccomendationLists[2])):
-        inList = False
-        for j in range(len(songs['songs'])):
-            if songs['songs'][j]['token'] == reccomendationLists[2][i]['token']:
-                inList = True
-        if not inList:
-            song = reccomendationLists[2][i]
-            print(song)
-            break
-        else:
-            song = reccomendationLists[2][0]
-
-else:
-    songs = json.load(open('pastSongs.json'))
-    for i in range(len(reccomendationLists[2])):
-        inList = False
-        for j in range(len(songs['songs'])):
-            if songs['songs'][j]['token'] == reccomendationLists[3][i]['token']:
-                inList = True
-        if not inList:
-            song = reccomendationLists[3][i]
-            print(song)
-            break
-        else:
-            song = reccomendationLists[3][0]'''
