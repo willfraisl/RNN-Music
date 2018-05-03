@@ -28,6 +28,7 @@ def JSONtoVectorList(fileName):
         attributeList.append(float(songs['songs'][i]['attributes']['liveness']))
         attributeList.append(float(songs['songs'][i]['attributes']['valence']))
         attributeList.append(float(songs['songs'][i]['attributes']['tempo']))
+        attributeList.append(float(songs['songs'][i]['attributes']['popularity']))
         songTokenList.append(songs['songs'][i]['token'])
         songClassificationList.append(songs['songs'][i]['classification'])
         songList.append(attributeList)
@@ -52,6 +53,7 @@ def JSONtoVectorList2(fileName):
         attributeList.append(float(songs['songs'][i]['attributes']['liveness']))
         attributeList.append(float(songs['songs'][i]['attributes']['valence']))
         attributeList.append(float(songs['songs'][i]['attributes']['tempo']))
+        attributeList.append(float(songs['songs'][i]['attributes']['popularity']))
         songTokenList.append(songs['songs'][i]['token'])
         songClassificationList.append(songs['songs'][i]['classification'])
         songList.append(attributeList)
@@ -121,7 +123,7 @@ def getNextSong(reccomendationLists):
             song['classification'] = i
             return song
         elif len(reccomendationLists[i]) > 1:
-            j = random.randint(0,len(reccomendationLists[i]))
+            j = random.randint(0,len(reccomendationLists[i])-1)
             song = reccomendationLists[i][j]
             song['classification'] = i
             return song
@@ -131,6 +133,30 @@ def getNextSong(reccomendationLists):
             song['classification'] = i
             return song
 
+# classify all songs based on past songs
+tup0 = JSONtoVectorList('pastSongs.json')
+songList0 = tup0[0]
+songTokenList0 = tup0[1]
+songClassifications0 = tup0[2] 
+
+
+tup1 = JSONtoVectorList('allSongs.json')
+songList1 = tup1[0]
+songTokenList1 = tup1[1]
+songClassifications1 = tup1[2]
+
+songs = json.load(open('allSongs.json'))
+if len(songList0) > 0:
+    model0 = getNBayes(songList0, songClassifications0)
+    songPredictions = predictSongs(model0, songList1)
+    #print(len(songs))
+    print(songPredictions)
+    for i in range(len(songs['songs'])):
+        songs['songs'][i]['classification'] = int(songPredictions[i])
+    with open('allSongs.json', 'w') as file:
+        json.dump(songs, file)
+
+# classify new songs based on all songs
 tup = JSONtoVectorList('allSongs.json')
 songList = tup[0]
 songTokenList = tup[1]
@@ -146,7 +172,6 @@ if song['previewURL'] != None:
     chrome_path = 'open -a /Applications/Google\ Chrome.app %s'
     webbrowser.get(chrome_path).open(song['previewURL'])
 
-songs = json.load(open('newSongs.json'))
 print(song)
 with open('nextSong.json', 'w') as file:
     json.dump(song, file)

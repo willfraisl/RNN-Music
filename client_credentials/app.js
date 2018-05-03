@@ -23,33 +23,41 @@ function test(){
   document.getElementById("test_text").innerHTML = "button pushed";
 }
 
-function seedPlaylist(userID, playlistID){
-  spotifyApi.clientCredentialsGrant()
-    .then(token => {
-      spotifyApi.setAccessToken(token.body.access_token);
-      return spotifyApi.getPlaylistTracks(userID, playlistID);
-    })
-    .then(playlistTracks => {
-      return  spotifyApi.getAudioFeaturesForTracks(playlistTracks.body.items.map(item => item.track.id));
-    })
-    .then(songsAttributes => {
-      //save to file here
-      console.log("got attributes");
-      fs.writeFile("songs.json", JSON.stringify(songsAttributes), 'utf8', function (err) {
-        if (err) {
-          return console.log(err);
-        }   
-        const initializeSongs = exec('/Library/Frameworks/Python.framework/Versions/3.6/bin/python3 initializeSongs.py', (error, stdout, stderr) => {
-          if (error) {
-            console.error(`exec error: ${error}`);
-            return;
-          }
-        });
+async function seedPlaylist(userID, playlistID){
+  var playlistTracks = spotifyApi.clientCredentialsGrant()
+  .then(token => {
+    spotifyApi.setAccessToken(token.body.access_token);
+    return spotifyApi.getPlaylistTracks(userID, playlistID);
+  });
+
+  var songsAttributes = playlistTracks.then(playlistTracks => {
+    return spotifyApi.getAudioFeaturesForTracks(playlistTracks.body.items.map(item => item.track.id));
+  });
+
+  var popularity = playlistTracks.then(playlistTracks => {
+    return playlistTracks.body.items.map(item => item.track.popularity);
+  });
+
+  return Promise.all([playlistTracks,songsAttributes, popularity]).then(function([a,b,c]){
+    for(var i = 0; i < c.length; i++){
+      b.body.audio_features[i].popularity = c[i];
+    }
+    console.log("got attributes");
+    fs.writeFile("songs.json", JSON.stringify(b), 'utf8', function (err) {
+      if (err) {
+        return console.log(err);
+      }   
+      const initializeSongs = exec('/Library/Frameworks/Python.framework/Versions/3.6/bin/python3 initializeSongs.py', (error, stdout, stderr) => {
+        if (error) {
+          console.error(`exec error: ${error}`);
+          return;
+        }
       });
-    })
-    .catch(err => {
-      console.log('error! ' + err);
     });
+  })
+  .catch(err => {
+    console.log('error! ' + err);
+  });
 }
 
 async function getSongsFromSeed(clusterJson){
@@ -59,11 +67,15 @@ async function getSongsFromSeed(clusterJson){
   var count = 0;
   
   for(var i = 0; i<6;i++){
+    //console.log(clusterJson['cluster'][count]);
     await spotifyApi.getRecommendations(clusterJson['cluster'][count]).then(data => {  
       var songs = [];
       spotifyApi.getAudioFeaturesForTracks(data['body']['tracks'].map(item => item.id)).then(attributes => {
         var count2 = 0;
         for(var j = 0; j < data['body']['tracks'].length; j++){
+          //console.log(attributes.body.audio_features[count2]);
+          //var attributes = attributes.body.audio_features[count2];
+          attributes.body.audio_features[count2].popularity = data['body']['tracks'][count2]['popularity']
           songs.push({
             "name":data['body']['tracks'][count2]['name'],
             "artist": data['body']['tracks'][count2]['artists'][0]['name'],
@@ -74,10 +86,10 @@ async function getSongsFromSeed(clusterJson){
           count2++;
         }
         data0[clusterRecommendations].push({songs});
-        fs.writeFile("newSongs.json", JSON.stringify(data0), function (err) {
-          if(err){
-            throw err;
-          }
+        fs.writeFile("newSongs.json", JSON.stringify(data0), 'utf8', function (err) {
+          if (err) {
+            return console.log(err);
+          }   
         });
         console.log("Reccomendations fetched for cluster " + count);
         count++;
@@ -88,6 +100,11 @@ async function getSongsFromSeed(clusterJson){
       console.log('error ' + err);
     });
   }
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve("classified songs");
+    }, 2000);
+  });
 }
 
 function addSong(song, classification){
@@ -119,7 +136,8 @@ function addSong(song, classification){
         "instrumentalness": song.attributes.instrumentalness,
         "liveness": song.attributes.liveness,
         "valence":song.attributes.valence,
-        "tempo":song.attributes.tempo},
+        "tempo":song.attributes.tempo,
+        "popularity":song.attributes.popularity},
       "classification": classification});
   }
   fs.writeFile("allSongs.json", JSON.stringify(allSongs), 'utf8', function (err) {
@@ -130,6 +148,7 @@ function addSong(song, classification){
 
   pastSongs.songs.push({
     "token": song.token,
+    "attributes": song.attributes,
     "classification": classification});
 
   // update the json file
@@ -200,7 +219,9 @@ function clusterSongs() {
 }
 
 function initializeSongs() {
-  seedPlaylist('124632828', '6X2OFVuHppo7uZHPjfJitd');
+  //spotify:user:1299375716:playlist:2j8o55IUy5O4YPPTB6yV0a
+  seedPlaylist('1299375716', '2j8o55IUy5O4YPPTB6yV0a');
+  //seedPlaylist('124632828', '6X2OFVuHppo7uZHPjfJitd');
   return new Promise(resolve => {
     setTimeout(() => {
       resolve("initialized songs");

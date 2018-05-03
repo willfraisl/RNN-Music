@@ -3,14 +3,14 @@
 import sys
 import numpy as np
 import tensorflow as tf
-from sklearn.cluster import KMeans
+from sklearn.cluster import KMeans, MeanShift
 import pandas as pd
 import json
 from sklearn.naive_bayes import GaussianNB
 
 def JSONtoVectorList(fileName):
     songs = json.load(open(fileName))
-    print(songs)
+    #print(songs)
     songList = []
     songTokenList = []
     songClassificationList = []
@@ -27,21 +27,28 @@ def JSONtoVectorList(fileName):
         attributeList.append(songs['songs'][i]['attributes']['liveness'])
         attributeList.append(songs['songs'][i]['attributes']['valence'])
         attributeList.append(songs['songs'][i]['attributes']['tempo'])
+        attributeList.append(songs['songs'][i]['attributes']['popularity'])
         attributeList.append(songs['songs'][i]['classification'])
         songTokenList.append(songs['songs'][i]['token'])
         songClassificationList.append(songs['songs'][i]['classification'])
         songList.append(attributeList)
     return (songList, songTokenList, songClassificationList)
 
-def clustersToJSON(clusters, tokens):
+def clustersToJSON(clusters, kmeans, songTokenList):
     data = {}
     data['cluster'] = []
     count = 0
     for cluster in clusters:
+        tokens = []
+        count1 = 0
+        for i in kmeans.labels_:
+            if(i == count and len(tokens) < 5):
+                tokens.append(songTokenList[count1])
+            count1+=1
         cluster = np.array(cluster).tolist()
         #danceability,energy,key,loudness,mode,speechiness,acousticness,instrumentalness,liveness,valence,tempo
-        data['cluster'].append({"limit":100,"seed_tracks":tokens[count],"danceability": cluster[0],"energy": cluster[1],"key": cluster[2],"loudness": cluster[3],
-        "popularity":100,"speechiness": cluster[5],"acousticness": cluster[6],"instrumentalness": cluster[7],
+        data['cluster'].append({"limit":100,"seed_tracks":tokens,"danceability": cluster[0],"energy": cluster[1],"key": cluster[2],"loudness": cluster[3],
+        "popularity":cluster[11],"speechiness": cluster[5],"acousticness": cluster[6],"instrumentalness": cluster[7],
         "liveness": cluster[8],"valence":cluster[9],"tempo":cluster[10]})
         count+=1
     
@@ -89,7 +96,7 @@ def KMeansCluster(vectors, num_clusters, songTokenList):
     tokens.append(four)
     tokens.append(five)
 
-    clustersToJSON(cluster_centers,tokens)
+    clustersToJSON(cluster_centers, kmeans, songTokenList)
     return (cluster_centers, tokens)
 
 # a string containing the name of the file 'songs.jason'
@@ -101,7 +108,14 @@ songTokenList = tup[1]
 songClassifications = tup[2] 
 
 # cluster the songs 
-num_clusters = 6
+X = songList
+ms = MeanShift(bandwidth=10, seeds=None, bin_seeding=False, min_bin_freq=1, cluster_all=True, n_jobs=1)
+ms.fit(X)
+labels = ms.labels_
+cluster_centers = ms.cluster_centers_
+print(len(cluster_centers))
+
+num_clusters = len(cluster_centers)
 clusters = KMeansCluster(songList, num_clusters, songTokenList)
 cluster_centers = json.load(open('clusters.json'))
-print(cluster_centers)
+#print(cluster_centers)
