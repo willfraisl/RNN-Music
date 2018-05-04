@@ -220,8 +220,8 @@ function clusterSongs() {
 
 function initializeSongs() {
   //spotify:user:1299375716:playlist:2j8o55IUy5O4YPPTB6yV0a
-  seedPlaylist('1299375716', '2j8o55IUy5O4YPPTB6yV0a');
-  //seedPlaylist('124632828', '6X2OFVuHppo7uZHPjfJitd');
+  //seedPlaylist('1299375716', '2j8o55IUy5O4YPPTB6yV0a');
+  seedPlaylist('124632828', '6X2OFVuHppo7uZHPjfJitd');
   return new Promise(resolve => {
     setTimeout(() => {
       resolve("initialized songs");

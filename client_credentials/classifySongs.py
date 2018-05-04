@@ -116,20 +116,26 @@ def getReccomendationLists(clustersReccomendations, model):
 
  # pick a song randomly from the top 10 or less songs
 def getNextSong(reccomendationLists):
+    #print(reccomendationLists[0])
+    #print(reccomendationLists[0][0]['attributes']['popularity'])
+    
+    #print(test)
+    #print(reccomendationLists[0])
     for i in range(len(reccomendationLists)):
-        if len(reccomendationLists[i]) > 10:
+        sortedlist = sorted(reccomendationLists[i], key=lambda x: x['attributes']['popularity'], reverse=True)
+        if len(sortedlist) > 10:
             j = random.randint(0,10)
-            song = reccomendationLists[i][j]
+            song = sortedlist[j]
             song['classification'] = i
             return song
-        elif len(reccomendationLists[i]) > 1:
-            j = random.randint(0,len(reccomendationLists[i])-1)
-            song = reccomendationLists[i][j]
+        elif len(sortedlist) > 1:
+            j = random.randint(0,len(sortedlist)-1)
+            song = sortedlist[j]
             song['classification'] = i
             return song
-        elif len(reccomendationLists[i]) > 0:
-            j = random.randint(0,len(reccomendationLists[i]))
-            song = reccomendationLists[i][0]
+        elif len(sortedlist) > 0:
+            j = random.randint(0,len(sortedlist))
+            song = sortedlist[0]
             song['classification'] = i
             return song
 
